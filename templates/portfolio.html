@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <!-- Portfolio Hero Section -->
+    <section class="hero-section bg-light py-5">
+        <div class="container">
+            <h1 class="text-center mb-4">Our Portfolio</h1>
+            <p class="lead text-center">Capturing Salina's most memorable moments</p>
+        </div>
+    </section>
+
+    <!-- Portfolio Gallery Section -->
+    <section class="portfolio-gallery container py-5">
+        {% for category in portfolio_categories %}
+            <h2 class="text-center mb-4">{{ category.name }}</h2>
+            <div class="row g-4 mb-5">
+                {% for image in category.images %}
+                    <div class="col-md-4">
+                        <figure class="figure">
+                            <a href="{{ image.url }}" class="gallery-item" data-sub-html='<h6 class="fs-sm text-light">{{ image.caption }}</h6>'>
+                                <img src="{{ image.url }}" class="figure-img img-fluid rounded shadow" alt="{{ image.alt }}">
+                                <div class="gallery-item-caption fs-sm fw-medium">{{ image.caption }}</div>
+                            </a>
+                        </figure>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta bg-primary text-white py-5">
+        <div class="container text-center">
+            <h2 class="mb-4">Like What You See?</h2>
+            <p class="lead mb-4">Let's create stunning memories for your next event.</p>
+            <a href="{% url 'booking' %}" class="btn btn-light btn-lg">Book Now</a>
+        </div>
+    </section>
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'vendor/lightgallery/css/lightgallery-bundle.min.css' %}">
+    <style>
+        .gallery-item {
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+        .gallery-item-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .gallery-item:hover .gallery-item-caption {
+            opacity: 1;
+        }
+    </style>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'vendor/lightgallery/lightgallery.min.js' %}"></script>
+    <script src="{% static 'vendor/lightgallery/plugins/thumbnail/lg-thumbnail.min.js' %}"></script>
+    <script src="{% static 'vendor/lightgallery/plugins/zoom/lg-zoom.min.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const galleries = document.querySelectorAll('.row');
+            galleries.forEach(gallery => {
+                lightGallery(gallery, {
+                    selector: '.gallery-item',
+                    plugins: [lgZoom, lgThumbnail],
+                    speed: 500,
+                });
+            });
+        });
+    </script>
+{% endblock %}

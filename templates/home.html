@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- Navbar -->
+    <!-- Assuming navbar is in base.html -->
+
+    <!-- Hero + Social Proof Section -->
+    <section class="hero-section container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-3">Capture Your Events, Share Your Story</h1>
+                <p class="lead mb-4">Professional event photography with guaranteed local media coverage. From corporate galas to community festivals, we bring Salina's events to life.</p>
+                <ul class="list-unstyled mb-4">
+                    <li><i class="fas fa-check-circle text-primary me-2"></i>Exclusive access to Salina311 media network</li>
+                    <li><i class="fas fa-check-circle text-primary me-2"></i>High-quality, professionally edited photos</li>
+                    <li><i class="fas fa-check-circle text-primary me-2"></i>Fast turnaround times</li>
+                    <li><i class="fas fa-check-circle text-primary me-2"></i>Tailored packages for every event size</li>
+                </ul>
+                <a href="{% url 'booking' %}" class="btn btn-primary btn-lg">Book Your Event Now</a>
+            </div>
+            <div class="col-lg-6 mt-4 mt-lg-0">
+                <img src="{{ hero_image }}" alt="PhotographerSalina Event Coverage" class="img-fluid rounded shadow-lg">
+                <div class="mt-3 p-3 bg-light rounded shadow-sm">
+                    <p class="fst-italic mb-1">"Long McArthur has used PhotographerSalina.com & Salina311 for photography at multiple Long McArthur events over the years. The whole experience is exceptional, they are great to work with and are very professional!"</p>
+                    <p class="small text-muted mb-0">- Ashley McArthur, Long McArthur Ford</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Features Section -->
+    <section class="features-section container py-5">
+        <h2 class="text-center mb-4">Our Services</h2>
+        <div class="row">
+            {% for feature in key_features %}
+                <div class="col-md-3">
+                    <h3>{{ feature.title }}</h3>
+                    <p>{{ feature.description }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- How it works Section -->
+    <section class="how-it-works-section container py-5">
+        <h2 class="text-center mb-4">Capture Your Event in 3 Easy Steps</h2>
+        <div class="row mt-3">
+            {% for step in how_it_works_steps %}
+                <div class="col-md-4">
+                    <h3>Step {{ forloop.counter }}</h3>
+                    <p>{{ step.description }}</p>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'booking' %}" class="btn btn-secondary">Get a Quote</a>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits-section container py-5">
+        <h2 class="text-center mb-4">Why Salina Event Organizers Choose Us</h2>
+        <div class="row">
+            {% for benefit in benefits %}
+                <div class="col-md-3">
+                    <img src="{{ benefit.image }}" alt="{{ benefit.title }}" class="img-fluid">
+                    <h3>{{ benefit.title }}</h3>
+                    <p>{{ benefit.description }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-section container py-5">
+        <h2 class="text-center mb-4">What Our Clients Say</h2>
+        <div class="row">
+            {% for testimonial in testimonials %}
+                <div class="col-md-6">
+                    <div class="testimonial-card">
+                        <img src="{{ testimonial.photo }}" alt="{{ testimonial.name }}" class="rounded-circle" style="width: 100px; height: 100px;">
+                        <p>"{{ testimonial.quote }}"</p>
+                        <p><strong>{{ testimonial.name }}</strong>, {{ testimonial.title }}</p>
+                        <p>Pain point: {{ testimonial.pain_point }}</p>
+                        <p>Solution: {{ testimonial.solution }}</p>
+                        <p>Benefit: {{ testimonial.benefit }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section container py-5">
+        <h2 class="text-center mb-4">Frequently Asked Questions</h2>
+        {% for question in faq_questions %}
+            <h3>{{ question.question }}</h3>
+            <p>{{ question.answer }}</p>
+        {% endfor %}
+    </section>
+
+    <!-- CTV Section -->
+    <section class="ctv-section container py-5 text-center">
+        <a href="{% url 'booking' %}" class="btn btn-primary btn-lg">Book Your Event Photography Now</a>
+    </section>
+
+    <!-- Footer -->
+    <!-- Assuming footer is in base.html -->
+{% endblock %}

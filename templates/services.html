@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- Services Hero Section -->
+    <section class="hero-section bg-light py-5">
+        <div class="container">
+            <h1 class="text-center mb-4">Our Photography Services</h1>
+            <p class="lead text-center">Professional event photography tailored to Salina's diverse community</p>
+        </div>
+    </section>
+
+    <!-- Main Services Section -->
+    <section class="main-services container py-5">
+        <div class="row">
+            {% for service in services %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <img src="{{ service.image }}" class="card-img-top" alt="{{ service.title }}">
+                        <div class="card-body">
+                            <h2 class="card-title h4">{{ service.title }}</h2>
+                            <p class="card-text">{{ service.description }}</p>
+                            <ul class="list-unstyled">
+                                {% for feature in service.features %}
+                                    <li><i class="fas fa-check-circle text-success me-2"></i>{{ feature }}</li>
+                                {% endfor %}
+                            </ul>
+                            <a href="{% url 'booking' %}" class="btn btn-primary">Book Now</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Additional Services Section -->
+    <section class="additional-services bg-light py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Additional Services</h2>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <ul class="list-group">
+                        {% for service in additional_services %}
+                            <li class="list-group-item">
+                                <i class="fas fa-plus-circle text-primary me-2"></i>{{ service }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Publication Options Section -->
+    <section class="publication-options container py-5">
+        <h2 class="text-center mb-4">Local Publication Options</h2>
+        <div class="row">
+            {% for option in publication_options %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title h5">{{ option.name }}</h3>
+                            <p class="card-text">{{ option.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta bg-primary text-white py-5">
+        <div class="container text-center">
+            <h2 class="mb-4">Ready to Capture Your Event?</h2>
+            <p class="lead mb-4">Let's discuss how we can create the perfect photography package for your needs.</p>
+            <a href="{% url 'contact' %}" class="btn btn-light btn-lg">Contact Us Today</a>
+        </div>
+    </section>
+{% endblock %}

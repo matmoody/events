@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- Contact Hero Section -->
+    <section class="hero-section bg-light py-5">
+        <div class="container">
+            <h1 class="text-center mb-4">Contact Us</h1>
+            <p class="lead text-center">Get in touch to discuss your event photography needs</p>
+        </div>
+    </section>
+
+    <!-- Contact Form and Info Section -->
+    <section class="contact-section container py-5">
+        <div class="row">
+            <div class="col-md-7 mb-4 mb-md-0">
+                <h2 class="mb-4">Send Us a Message</h2>
+                <div data-tf-live="01J9SEZQ90KMRRAGF0857P088J"></div><script src="//embed.typeform.com/next/embed.js"></script>
+            </div>
+            <div class="col-md-5">
+                <h2 class="mb-4">Contact Information</h2>
+                <ul class="list-unstyled">
+                    <li class="mb-3">
+                        <i class="fas fa-envelope me-2"></i>
+                        <a href="mailto:{{ contact_info.email }}">{{ contact_info.email }}</a>
+                    </li>
+                    <li class="mb-3">
+                        <i class="fas fa-phone me-2"></i>
+                        <a href="tel:{{ contact_info.phone }}">{{ contact_info.phone }}</a>
+                    </li>
+                    <li class="mb-3">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        {{ contact_info.address }}
+                    </li>
+                </ul>
+                <h3 class="mt-5 mb-3">Business Hours</h3>
+                <p>Monday - Friday: 9:00 AM - 6:00 PM<br>
+                   Saturday: 10:00 AM - 4:00 PM<br>
+                   Sunday: Closed</p>
+                <h3 class="mt-5 mb-3">Follow Us</h3>
+                
+                <!-- If there's a CTA button in the contact page -->
+                <a href="{% url 'booking' %}" class="btn btn-primary btn-lg">Book Your Event</a>
+            </div>
+        </div>
+    </section>
+
+    
+{% endblock %}
