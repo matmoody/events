@@ -1,0 +1,33 @@
+{% for day_data in days_data %}
+<div class="day-section mb-4">
+    <h3 class="day-header {% if day_data.date == today %}text-primary{% endif %}">
+        {{ day_data.date|date:"l, F j, Y" }}
+        {% if day_data.date == today %}(Today){% endif %}
+    </h3>
+    
+    {% if day_data.events %}
+        {% for event in day_data.events %}
+        <div class="event-card mb-3 {{ event.category|lower }}">
+            {% if event.event_start_time %}
+            <div class="event-time">{{ event.event_start_time|time:"g:i A" }}</div>
+            {% endif %}
+            <div class="event-title">{{ event.title }}</div>
+            {% if event.location %}
+            <div class="event-location">
+                <small>{{ event.location }}</small>
+            </div>
+            {% endif %}
+            {% if event.description %}
+            <div class="event-description mt-2">
+                <small class="text-muted">{{ event.description }}</small>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">No events scheduled for this day</p>
+    {% endif %}
+    
+    <hr class="my-4">
+</div>
+{% endfor %}

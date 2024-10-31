@@ -1,0 +1,32 @@
+<div class="today-events">
+    <h3>
+        {% if selected_date == today %}
+            Today's Events
+        {% else %}
+            Events for {{ selected_date|date:"F j, Y" }}
+        {% endif %}
+    </h3>
+    <div class="today-date">{{ selected_date|date:"l, F j, Y" }}</div>
+    {% if selected_events %}
+        {% for event in selected_events %}
+        <div class="event-card mb-3 {{ event.category|lower }}">
+            {% if event.event_start_time %}
+            <div class="event-time">{{ event.event_start_time|time:"g:i A" }}</div>
+            {% endif %}
+            <div class="event-title">{{ event.title }}</div>
+            {% if event.location %}
+            <div class="event-location">
+                <small>{{ event.location }}</small>
+            </div>
+            {% endif %}
+            {% if event.description %}
+            <div class="event-description mt-2">
+                <small class="text-muted">{{ event.description|truncatewords:30 }}</small>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">No events scheduled for this day</p>
+    {% endif %}
+</div>

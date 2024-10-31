@@ -1,109 +1,277 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-    <!-- Navbar -->
-    <!-- Assuming navbar is in base.html -->
-
-    <!-- Hero + Social Proof Section -->
-    <section class="hero-section container py-5">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-3">Capture Your Events, Share Your Story</h1>
-                <p class="lead mb-4">Professional event photography with guaranteed local media coverage. From corporate galas to community festivals, we bring Salina's events to life.</p>
-                <ul class="list-unstyled mb-4">
-                    <li><i class="fas fa-check-circle text-primary me-2"></i>Exclusive access to Salina311 media network</li>
-                    <li><i class="fas fa-check-circle text-primary me-2"></i>High-quality, professionally edited photos</li>
-                    <li><i class="fas fa-check-circle text-primary me-2"></i>Fast turnaround times</li>
-                    <li><i class="fas fa-check-circle text-primary me-2"></i>Tailored packages for every event size</li>
-                </ul>
-                <a href="{% url 'booking' %}" class="btn btn-primary btn-lg">Book Your Event Now</a>
-            </div>
-            <div class="col-lg-6 mt-4 mt-lg-0">
-                <img src="{{ hero_image }}" alt="PhotographerSalina Event Coverage" class="img-fluid rounded shadow-lg">
-                <div class="mt-3 p-3 bg-light rounded shadow-sm">
-                    <p class="fst-italic mb-1">"Long McArthur has used PhotographerSalina.com & Salina311 for photography at multiple Long McArthur events over the years. The whole experience is exceptional, they are great to work with and are very professional!"</p>
-                    <p class="small text-muted mb-0">- Ashley McArthur, Long McArthur Ford</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Key Features Section -->
-    <section class="features-section container py-5">
-        <h2 class="text-center mb-4">Our Services</h2>
-        <div class="row">
-            {% for feature in key_features %}
-                <div class="col-md-3">
-                    <h3>{{ feature.title }}</h3>
-                    <p>{{ feature.description }}</p>
-                </div>
-            {% endfor %}
-        </div>
-    </section>
-
-    <!-- How it works Section -->
-    <section class="how-it-works-section container py-5">
-        <h2 class="text-center mb-4">Capture Your Event in 3 Easy Steps</h2>
-        <div class="row mt-3">
-            {% for step in how_it_works_steps %}
-                <div class="col-md-4">
-                    <h3>Step {{ forloop.counter }}</h3>
-                    <p>{{ step.description }}</p>
-                </div>
-            {% endfor %}
-        </div>
-        <div class="text-center mt-4">
-            <a href="{% url 'booking' %}" class="btn btn-secondary">Get a Quote</a>
-        </div>
-    </section>
-
-    <!-- Benefits Section -->
-    <section class="benefits-section container py-5">
-        <h2 class="text-center mb-4">Why Salina Event Organizers Choose Us</h2>
-        <div class="row">
-            {% for benefit in benefits %}
-                <div class="col-md-3">
-                    <img src="{{ benefit.image }}" alt="{{ benefit.title }}" class="img-fluid">
-                    <h3>{{ benefit.title }}</h3>
-                    <p>{{ benefit.description }}</p>
-                </div>
-            {% endfor %}
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="testimonials-section container py-5">
-        <h2 class="text-center mb-4">What Our Clients Say</h2>
-        <div class="row">
-            {% for testimonial in testimonials %}
-                <div class="col-md-6">
-                    <div class="testimonial-card">
-                        <img src="{{ testimonial.photo }}" alt="{{ testimonial.name }}" class="rounded-circle" style="width: 100px; height: 100px;">
-                        <p>"{{ testimonial.quote }}"</p>
-                        <p><strong>{{ testimonial.name }}</strong>, {{ testimonial.title }}</p>
-                        <p>Pain point: {{ testimonial.pain_point }}</p>
-                        <p>Solution: {{ testimonial.solution }}</p>
-                        <p>Benefit: {{ testimonial.benefit }}</p>
+<!-- Desktop Calendar View -->
+<div class="container-fluid d-none d-md-block">
+    <div class="row">
+        <div class="col-10">
+            <div class="calendar-container">
+                <div class="calendar-header d-flex justify-content-between align-items-center mb-4">
+                    <h2>{{ month_name }} {{ year }}</h2>
+                    <div class="calendar-nav">
+                        <a href="?month={{ prev_month }}&year={{ prev_year }}" class="btn btn-outline-primary">&lt; Previous</a>
+                        <a href="?month={{ next_month }}&year={{ next_year }}" class="btn btn-outline-primary">Next &gt;</a>
                     </div>
                 </div>
-            {% endfor %}
+
+                <table class="calendar table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Sunday</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                            <th>Saturday</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for week in calendar_data %}
+                        <tr>
+                            {% for day, events in week %}
+                            <td class="{% if day.month != current_month %}text-muted{% endif %} {% if day == today %}today{% endif %} {% if day == selected_date %}selected{% endif %}"
+                                {% if day %}
+                                hx-get="{% url 'events_for_date' %}"
+                                hx-trigger="click"
+                                hx-target="#events-sidebar"
+                                hx-vals='{"date": "{{ day|date:'Y-m-d' }}"}'
+                                style="cursor: pointer;"
+                                {% endif %}
+                            >
+                                <div class="date-header">{{ day.day }}</div>
+                                {% if events %}
+                                <div class="events-list">
+                                    {% for event in events %}
+                                    <div class="event-item {{ event.category|lower }}" data-bs-toggle="tooltip" title="{{ event.title }}">
+                                        {% if event.event_start_time %}
+                                        <small>{{ event.event_start_time|time:"g:i A" }}</small>
+                                        {% endif %}
+                                        <div class="event-title">{{ event.title|truncatechars:20 }}</div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </section>
 
-    <!-- FAQ Section -->
-    <section class="faq-section container py-5">
-        <h2 class="text-center mb-4">Frequently Asked Questions</h2>
-        {% for question in faq_questions %}
-            <h3>{{ question.question }}</h3>
-            <p>{{ question.answer }}</p>
-        {% endfor %}
-    </section>
+        <!-- Today's Events Sidebar -->
+        <div class="col-2" id="events-sidebar">
+            {% include 'partials/events_sidebar.html' %}
+        </div>
+    </div>
+</div>
 
-    <!-- CTV Section -->
-    <section class="ctv-section container py-5 text-center">
-        <a href="{% url 'booking' %}" class="btn btn-primary btn-lg">Book Your Event Photography Now</a>
-    </section>
+<!-- Mobile Days View -->
+<div class="container-fluid d-block d-md-none">
+    <div id="mobile-events-list">
+        {% include 'partials/mobile_events_list.html' %}
+    </div>
+    
+    <div class="text-center mt-3 mb-5">
+        <button class="btn btn-primary" 
+                hx-get="{% url 'load_more_days' %}"
+                hx-target="#mobile-events-list"
+                hx-swap="beforeend"
+                hx-trigger="click"
+                hx-vals='{"last_date": "{{ last_date|date:'Y-m-d' }}"}'
+        >
+            Load More Days
+        </button>
+    </div>
+</div>
 
-    <!-- Footer -->
-    <!-- Assuming footer is in base.html -->
+<style>
+    .calendar-container {
+        padding: 20px;
+    }
+    
+    .calendar th {
+        text-align: center;
+        background-color: #f8f9fa;
+    }
+    
+    .calendar td {
+        height: 120px;
+        width: 14.28%;
+        vertical-align: top;
+        padding: 5px;
+    }
+    
+    .date-header {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .today {
+        background-color: #fff3cd;
+    }
+    
+    .event-item {
+        background-color: #e3f2fd;
+        margin-bottom: 2px;
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-size: 0.8em;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    
+    .today-events {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        height: 100%;
+    }
+    
+    .event-card {
+        background-color: white;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .event-time {
+        color: #666;
+        font-weight: bold;
+    }
+    
+    .entertainment {
+        background-color: #ffcdd2;  /* Light red */
+        border-left: 3px solid #e57373;
+    }
+    
+    .sports {
+        background-color: #c8e6c9;  /* Light green */
+        border-left: 3px solid #81c784;
+    }
+    
+    .arts {
+        background-color: #e1bee7;  /* Light purple */
+        border-left: 3px solid #ba68c8;
+    }
+    
+    .government {
+        background-color: #bbdefb;  /* Light blue */
+        border-left: 3px solid #64b5f6;
+    }
+    
+    .other {
+        background-color: #f5f5f5;  /* Light grey */
+        border-left: 3px solid #bdbdbd;
+    }
+    
+    .event-card.entertainment { border-left-color: #e57373; }
+    .event-card.sports { border-left-color: #81c784; }
+    .event-card.arts { border-left-color: #ba68c8; }
+    .event-card.government { border-left-color: #64b5f6; }
+    .event-card.other { border-left-color: #bdbdbd; }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.9em;
+    }
+    
+    .color-box {
+        width: 20px;
+        height: 20px;
+        border-radius: 3px;
+    }
+    
+    .color-box.entertainment { background-color: #ffcdd2; }
+    .color-box.sports { background-color: #c8e6c9; }
+    .color-box.arts { background-color: #e1bee7; }
+    .color-box.government { background-color: #bbdefb; }
+    .color-box.other { background-color: #f5f5f5; }
+    
+    /* Mobile Styles */
+    @media (max-width: 767.98px) {
+        .day-section {
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .day-header {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        
+        .event-card {
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #ddd;
+            margin-bottom: 10px;
+        }
+        
+        .event-time {
+            font-weight: bold;
+            color: #666;
+        }
+        
+        .event-title {
+            font-size: 1.1rem;
+            margin: 5px 0;
+        }
+        
+        /* Category colors remain the same */
+        .entertainment { border-left-color: #e57373; }
+        .sports { border-left-color: #81c784; }
+        .arts { border-left-color: #ba68c8; }
+        .government { border-left-color: #64b5f6; }
+        .other { border-left-color: #bdbdbd; }
+    }
+    
+    .category-legend {
+        padding: 0 20px;
+    }
+    
+    /* If you want to adjust the spacing between legend items */
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.9em;
+        margin-right: 20px;  /* Adds space between legend items */
+    }
+</style>
+
+<!-- Add this just below the calendar table -->
+<div class="category-legend mt-3">
+    <div class="d-flex flex-wrap gap-3">
+        <div class="legend-item">
+            <span class="color-box entertainment"></span>
+            Entertainment
+        </div>
+        <div class="legend-item">
+            <span class="color-box sports"></span>
+            Sports
+        </div>
+        <div class="legend-item">
+            <span class="color-box arts"></span>
+            Arts
+        </div>
+        <div class="legend-item">
+            <span class="color-box government"></span>
+            Government
+        </div>
+        <div class="legend-item">
+            <span class="color-box other"></span>
+            Other
+        </div>
+    </div>
+</div>
+
 {% endblock %}
