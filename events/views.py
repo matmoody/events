@@ -1,10 +1,18 @@
 from django.views.generic import TemplateView, View
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from calendar import monthcalendar
 from datetime import datetime, date, timedelta
 from .models import Event
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
+import stripe
+from django.urls import reverse
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class CalendarView(TemplateView):
     template_name = 'home.html'
@@ -148,3 +156,131 @@ class LoadMoreDaysView(View):
                 'events': events,
             })
         return days_data
+
+class HirePhotographerView(View):
+    def get(self, request, event_id):
+        event = get_object_or_404(Event, id=event_id)
+        return render(request, 'partials/photographer_modal.html', {'event': event})
+
+class RequestPhotographerView(View):
+    def post(self, request, event_id):
+        event = get_object_or_404(Event, id=event_id)
+        
+        # Get form data
+        contact_name = request.POST.get('contact_name')
+        contact_email = request.POST.get('contact_email')
+        contact_phone = request.POST.get('contact_phone')
+        notes = request.POST.get('notes')
+        
+        # # Send email
+        # subject = f'Photographer Request for {event.title}'
+        # message = render_to_string('emails/photographer_request.html', {
+        #     'event': event,
+        #     'contact_name': contact_name,
+        #     'contact_email': contact_email,
+        #     'contact_phone': contact_phone,
+        #     'notes': notes,
+        # })
+        
+        # send_mail(
+        #     subject,
+        #     message,
+        #     settings.DEFAULT_FROM_EMAIL,
+        #     [settings.PHOTOGRAPHER_EMAIL],  # Add this to your settings.py
+        #     fail_silently=False,
+        # )
+        
+        # Return success message
+        return render(request, 'partials/photographer_modal.html', {
+            'event': event,
+            'success': True,
+            'message': 'Your request has been sent! We will contact you shortly.'
+        })
+
+class CreateCheckoutSessionView(View):
+    def get(self, request, event_id):
+        event = get_object_or_404(Event, id=event_id)
+        
+        # Create Stripe checkout session
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price_data': {
+                    'currency': 'usd',
+                    'unit_amount': settings.PHOTOGRAPHER_PRICE,
+                    'product_data': {
+                        'name': f'Book A Photographer for {event.title} ',
+                        'description': f'Professional photography coverage for this event on {event.event_date}. A photographer will attend the event, shoot a photo gallery, publish the photo gallery on Salina311, The Morning Briefing, and the Salina311 Newspaper. You will own the photos!',
+                        'images': ['https://lrtest47.s3.us-east-1.amazonaws.com/gallery-example.png'],  # Optional
+                    },
+                },
+                'quantity': 1,
+            }],
+            metadata={
+                'event_id': event.id,
+                'event_title': event.title,
+                'event_date': event.event_date.isoformat(),
+            },
+            mode='payment',
+            success_url=request.build_absolute_uri(
+                reverse('checkout_success')
+            ) + '?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url=request.build_absolute_uri(reverse('home')),
+        )
+        
+        return redirect(checkout_session.url)
+
+class CheckoutSuccessView(View):
+    def get(self, request):
+        session_id = request.GET.get('session_id')
+        if session_id:
+            try:
+                # Retrieve the full session data from Stripe
+                session = stripe.checkout.Session.retrieve(session_id)
+                #print(f"Session data: {session}")  # Debug print
+                event = get_object_or_404(Event, id=int(session.metadata['event_id']))
+                
+                # Update event with photographer status
+                event.photographer = True
+                event.save()
+                
+                # Send confirmation emails
+                send_booking_confirmation(event, session)
+                
+                return render(request, 'checkout_success.html', {'session': session})
+                
+            except Exception as e:
+                print(f"Error processing checkout: {e}")
+                # Handle error appropriately
+                return render(request, 'checkout_success.html', {'error': str(e)})
+                
+        return render(request, 'checkout_success.html', {'error': 'Invalid session'})
+
+def send_booking_confirmation(event, session):
+    sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+    
+    # Get customer email from session
+    customer_email = session.customer_details.email
+    #print(f"Customer email: {customer_email}")  # Debug print
+    
+    # Send email to customer
+    html_content = render_to_string('emails/customer_photographer_booked.html', {
+        'event': event,
+        'session': session,
+    })
+    
+    customer_message = Mail(
+        from_email=('sarah@salina311.com', 'Salina311 Events'),
+        to_emails=customer_email,
+        subject=f'Salina311 Photographer Booking Confirmation: {event.title}',
+        html_content=html_content
+    )
+    
+    # Optional: Add categories or custom tracking settings
+    # customer_message.category = ['photographer-booking']
+    # print(f"Customer message: {customer_message}")
+    
+    try:
+        sg.send(customer_message)
+    except Exception as e:
+        print(f"Error sending customer email: {e}")

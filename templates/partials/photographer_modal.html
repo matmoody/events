@@ -1,0 +1,40 @@
+<div class="modal-header">
+    <h5 class="modal-title">Hire Photographer for {{ event.title }}</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+    <p>Would you like to request a photographer for:</p>
+    <div class="event-details mb-3">
+        <strong>Event:</strong> {{ event.title }}<br>
+        <strong>Date:</strong> {{ event.event_date|date:"F j, Y" }}<br>
+        {% if event.event_start_time %}
+        <strong>Time:</strong> {{ event.event_start_time|time:"g:i A" }}<br>
+        {% endif %}
+        {% if event.location %}
+        <strong>Location:</strong> {{ event.location }}
+        {% endif %}
+    </div>
+    
+    <form hx-post="{% url 'request_photographer' event.id %}"
+          hx-target="#photographerModal .modal-content">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="contactName" class="form-label">Your Name</label>
+            <input type="text" class="form-control" id="contactName" name="contact_name" required>
+        </div>
+        <div class="mb-3">
+            <label for="contactEmail" class="form-label">Your Email</label>
+            <input type="email" class="form-control" id="contactEmail" name="contact_email" required>
+        </div>
+        <div class="mb-3">
+            <label for="contactPhone" class="form-label">Your Phone</label>
+            <input type="tel" class="form-control" id="contactPhone" name="contact_phone" required>
+        </div>
+        <div class="mb-3">
+            <label for="notes" class="form-label">Additional Notes</label>
+            <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Request</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </form>
+</div>

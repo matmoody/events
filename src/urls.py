@@ -16,11 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from events.views import CalendarView, EventsForDateView, LoadMoreDaysView
+from events.views import CalendarView, EventsForDateView, LoadMoreDaysView, HirePhotographerView, RequestPhotographerView, CreateCheckoutSessionView, CheckoutSuccessView
 
 urlpatterns = [
     path('', CalendarView.as_view(), name='home'),
     path('events-for-date/', EventsForDateView.as_view(), name='events_for_date'),
     path('load-more-days/', LoadMoreDaysView.as_view(), name='load_more_days'),
     path('admin/adshp98q3gwpf9uerphieagouqefy8dtuyfydrdr', admin.site.urls),
+    path('hire-photographer/<int:event_id>/', HirePhotographerView.as_view(), name='hire_photographer'),
+    path('request-photographer/<int:event_id>/', RequestPhotographerView.as_view(), name='request_photographer'),
+    path('create-checkout-session/<int:event_id>/', 
+         CreateCheckoutSessionView.as_view(), 
+         name='create_checkout_session'),
+    path('checkout-success/', 
+         CheckoutSuccessView.as_view(), 
+         name='checkout_success'),
 ]

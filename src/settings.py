@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-d)0zh1q0ui*o-z$wc#u37wksd^apvgj-1o#8-=5tet9=5*scm1
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEVELOPMENT_MODE = False
-DEBUG = False
+DEBUG = DEVELOPMENT_MODE
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'plankton-app-2-q4hal.ondigitalocean.app', 'events.salina311.com']
 
@@ -136,3 +136,16 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Stripe keys
+if DEVELOPMENT_MODE is True:
+    STRIPE_SECRET_KEY = 'sk_test_51J8A0fEXaLTQ45rgyubzyPe82v8Ef0LoX9haeNYsp0Vro2dCqY65YoXYwzqtxA7f2PIkBKCfsUJnvg0r4eH4Tucw00ZK7lvVyK'
+else:
+    STRIPE_SECRET_KEY = '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'
+
+PHOTOGRAPHER_PRICE = 20000  # $200 in cents
+
+# Email Settings with SendGrid
+SENDGRID_API_KEY = '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'
+DEFAULT_FROM_EMAIL = "sarah@salina311.com"
+PHOTOGRAPHER_EMAIL = "joshua@salina311.com"

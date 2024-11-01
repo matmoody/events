@@ -1,0 +1,13 @@
+New Photographer Booking
+
+Event: {{ event.title }}
+Date: {{ event.event_date|date:"F j, Y" }}
+{% if event.event_start_time %}Time: {{ event.event_start_time|time:"g:i A" }}{% endif %}
+{% if event.location %}Location: {{ event.location }}{% endif %}
+
+Customer Details:
+Name: {{ session.customer_details.name }}
+Email: {{ session.customer_details.email }}
+
+Payment Status: {{ session.payment_status }}
+Amount Paid: ${{ session.amount_total|floatformat:2 }}
